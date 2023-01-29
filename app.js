@@ -12,6 +12,8 @@ const {} = require('./sequelize');
 
 const PORT = process.env.PORT | 3000;
 
+const indexRouter = require('./routes/indexRoute');
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(express.json({ limit: '2mb' }));
@@ -23,7 +25,8 @@ app.use(pp.passport.initialize());
 app.use(pp.passport.session());
 
 app.use('/login', requireNotAuthenticated, pp.router);
-app.get('/', requireAuthenticated, (req, res) => res.render("index"));
+app.use('/', requireAuthenticated, indexRouter);
+
 app.get('/logout', (req, res) => {
   req.logOut();
   res.redirect('/');
@@ -31,6 +34,8 @@ app.get('/logout', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('user connected');
+
+  // socket.disconnect(true);
   
   socket.on('disconnect', function () {
     console.log('user disconnected');
